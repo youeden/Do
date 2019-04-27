@@ -1,13 +1,16 @@
-(function MrAndMs() {
+(function Frodo() {
 
-    if (window.Mr) return;
-    window.Mr = Mr;
+    if (window.Frodo) return;
+    window.Frodo = Frodo;
 
-    function Mr(selector, context) {
-        return Mr.find(selector, context);
+
+    function Frodo(selector, context) {
+        return Frodo.find(selector, context);
     }
 
-    function Ms(selector, context) {
+
+    // defined an supporter,just like Sam in > THE RING OF KING
+    function Sam(selector, context) {
         if (!selector) { throw 'selector can not be null.'; };
 
         this._elements = [];
@@ -16,7 +19,7 @@
         var type = typeof (selector);
         if (type == 'object') {
             if (isArray(selector)) {
-                for (var i = 0; i < selector.length; i++) {
+                for (let i = 0; i < selector.length; i++) {
                     this._elements.push(selector[i]);
                 }
             } else this._elements.push(selector);
@@ -24,20 +27,22 @@
 			
         } else if (type == 'string') { // css selector
 			if(window.Sizzle){
-				var matchedElems = Sizzle(this.selector, context);
-				var len = matchedElems.length;
-				for(var i = 0 ; i < len ; i++){
+				let matchedElems = Sizzle(this.selector, context);
+			    let len = matchedElems.length;
+
+				for(let i = 0 ; i < len ; i++){
 					this._elements.push(matchedElems[i]);
 				}
             }
-			/*
+			
 			else if (document.querySelectorAll) {
-                var nodeList = document.querySelectorAll(this.selector);
-                var len = nodeList.length;
+                let nodeList = document.querySelectorAll(this.selector);
+                let len = nodeList.length;
                 for (var i = 0; i < len; i++) {
                     this._elements.push(nodeList.item(i));
+                    /* here, querySelectorAll return a node list and it is [STATIC] node list; include some functions eg: item(), and this item() will store node name, It accept at lest one argument  */
                 }
-            }*/
+            }
         } else if (type == 'function') { // document loaded
             contentLoaded(this.selector, false);
         }
@@ -45,35 +50,18 @@
 
     Mr._extend = function (target, extObj) {
         if (extObj.length) { // array or arguments
-            var len = extObj.length;
-            for (var i = 0; i < len; i++) {
+            let len = extObj.length;
+            for (let i = 0; i < len; i++) {
                 Mr._extend(target, extObj[i]);
             }
         } else if (extObj) {
             target = target || {};
-            for (var p in extObj) {
+            for (let p in extObj) {
                 target[p] = extObj[p];
             }
         }
     };
 
-    function SWF(movieName) {
-        this.movieName = movieName;
-    }
-
-    Mr._extend(SWF.prototype, {
-        call: function (funcName, args) {
-            var that = this;
-            (function loadSWF() {
-                var target = Mr._getSwf(that.movieName);
-                if (target && target[funcName]) {
-                    target[funcName].apply(target, args || []);
-                } else {
-                    window.setTimeout(loadSWF, 500);
-                }
-            })();
-        }
-    });
 
     function Animation(animObj, tweenType, easeType) {
         this.ONSTART = 'onstart';
@@ -85,9 +73,9 @@
         this.timeInterval = null;
         this.stoped = false;
 
-        var contains = false;
-        for (var property in this.funcNames) {
-            var func = animObj[property];
+        let contains = false;
+        for (let property in this.funcNames) {
+            let func = animObj[property];
             if (func != 'undefined' && typeof (func) == 'function') {
                 this.funcNames[property] = true;
                 contains = true;
@@ -104,10 +92,7 @@
         this.animObj = animObj;
     }
 
-    // b : beginning value, 0
-    // t : current time
-    // c : change in value
-    // d : fps, 50
+    // b : beginning value;  t : current time;  c : change in value;  d : delay times
     var Tween = {
         Linear: function (t, b, c, d) { return c * t / d + b; },
         Quad: {
@@ -254,6 +239,18 @@
         func : function(tweenType, easeType) {
             let func = Tween[tweenType];
             let innerEaseType = easeType || "easeIn";
+
+            if(typeof func == "function") {
+                return func;     
+            }else if (typeof func == "object") {
+                return func[easeType];    
+            }else {
+                return Tween.Linear;    
+            }
         }
     }
 
+
+
+
+})();
